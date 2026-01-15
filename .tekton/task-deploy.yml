@@ -4,13 +4,13 @@ metadata:
   name: deploy-openshift
 spec:
   params:
-  - name: APP_NAME
-    type: string
-  - name: IMAGE
-    type: string
+    - name: APP_NAME
+      type: string
+    - name: IMAGE
+      type: string
   steps:
-  - name: deploy
-    image: quay.io/openshift/origin-cli
-    script: |
-      oc set image deployment/$(params.APP_NAME) \
-      $(params.APP_NAME)=$(params.IMAGE)
+    - name: deploy
+      image: quay.io/openshift/origin-cli
+      script: |
+        oc set image deployment/$(params.APP_NAME) \
+        $(params.APP_NAME)=$(params.IMAGE)

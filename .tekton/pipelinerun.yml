@@ -1,18 +1,53 @@
 apiVersion: tekton.dev/v1
-kind: PipelineRun
+kind: Pipeline
 metadata:
-  name: ci-cd-pipeline-run
+  name: ci-cd-pipeline
 spec:
-  pipelineRef:
-    name: ci-cd-pipeline
-
   params:
     - name: IMAGE
-      value: image-registry.openshift-image-registry.svc:5000/meu-projeto/minha-app
+      type: string
     - name: APP_NAME
-      value: minha-app
+      type: string
 
   workspaces:
     - name: shared-workspace
-      persistentVolumeClaim:
-        claimName: pipeline-pvc
+
+  tasks:
+    - name: lint
+      taskRef:
+        name: nodejs-lint
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+
+    - name: test
+      runAfter:
+        - lint
+      taskRef:
+        name: nodejs-test
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+
+    - name: build
+      runAfter:
+        - test
+      taskRef:
+        name: build-image
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+
+    - name: deploy
+      runAfter:
+        - build
+      taskRef:
+        name: deploy-openshift
+      params:
+        - name: APP_NAME
+          value: $(params.APP_NAME)
+        - name: IMAGE
+          value: $(params.IMAGE)
