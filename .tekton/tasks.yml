@@ -1,29 +1,14 @@
-apiVersion: tekton.dev/v1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: cleanup
-spec:
-  steps:
-    - name: cleanup-workspace
-      image: alpine
-      script: |
-        echo "Cleaning up workspace..."
-        rm -rf /workspace/*
-        echo "Cleanup completed"
-
----
-apiVersion: tekton.dev/v1
-kind: Task
-metadata:
-  name: git-clone
+  name: jest-test
 spec:
   workspaces:
-    - name: output
-  params:
-    - name: url
-      type: string
-    - name: revision
-      type: string
-      default: main
+    - name: source
   steps:
-    - name: clone
+    - name: run-jest
+      image: node:18
+      workingDir: $(workspaces.source.path)
+      script: |
+        npm install
+        npm test
