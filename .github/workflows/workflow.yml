@@ -7,23 +7,23 @@ on:
     branches: [ "main" ]
 
 jobs:
-  ci:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout do código
-      uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-    - name: Configurar Node.js
-      uses: actions/setup-node@v3
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
       with:
-        node-version: 18
+        node-version: '18'
 
-    - name: Instalar dependências
+    - name: Install dependencies
       run: npm install
 
-    - name: Executar Lint
-      run: npm run lint
+    - name: Run ESLint
+      run: npx eslint .
 
-    - name: Executar Testes
+    - name: Run unit tests with Jest
       run: npm test
